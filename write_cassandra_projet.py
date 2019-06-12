@@ -114,7 +114,7 @@ create_query_2 = '''CREATE TABLE agaltier_zkang_metar_France_2(
                 );'''
 
 def writecassandra_1(csvfilename, session):
-    data = limit_gen(loadata(csvfilename),  100000)
+    data = limit_gen(loadata(csvfilename),  1000)
     # data = loadata(csvfilename)
     for r in data:
         t = (
@@ -218,7 +218,7 @@ def writecassandra_1(csvfilename, session):
         session.execute(query, t)
 
 def writecassandra_2(csvfilename, session):
-    data = limit_gen(loadata(csvfilename),  100000)
+    data = limit_gen(loadata(csvfilename),  1000)
     # data = loadata(csvfilename)
     for r in data:
         t = (
@@ -322,10 +322,10 @@ def writecassandra_2(csvfilename, session):
         session.execute(query, t)
 
 
-# session.execute('DROP TABLE agaltier_zkang_metar_France_1')
-# session.execute(create_query_1)
-# writecassandra_1(csvfilename, session)
+session.execute('DROP TABLE agaltier_zkang_metar_France_1')
+session.execute(create_query_1)
+writecassandra_1(csvfilename, session)
 
-# session.execute('DROP TABLE agaltier_zkang_metar_France_2')
-# session.execute(create_query_2)
-# writecassandra_2(csvfilename, session)
+session.execute('DROP TABLE agaltier_zkang_metar_France_2')
+session.execute(create_query_2)
+writecassandra_2(csvfilename, session)
