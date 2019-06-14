@@ -6,6 +6,8 @@ import glob
 
 from math import sqrt
 
+import random
+
 from pykrige.ok import OrdinaryKriging
 from pykrige.kriging_tools import write_asc_grid
 import pykrige.kriging_tools as kt
@@ -37,7 +39,7 @@ def getIndicatorCluster(indicators, start_year, start_month, start_day, start_ho
                 FROM agaltier_zkang_metar_France_2
                 WHERE year >= """ + str(start_year) + """
                 AND year <= """ + str(end_year) + """
-                LIMIT 10000
+                LIMIT 40
                 ALLOW FILTERING;
                 """
     elif (start_month != end_month):
@@ -97,16 +99,16 @@ def getIndicatorCluster(indicators, start_year, start_month, start_day, start_ho
         for x in row:
             if (x == None): flag = False
         if (flag & (row[0]>=40) & (row[0]<=50) & (row[1]!=None) & (row[1]>=-5) & (row[1]<=7.5)):
-            res = {}
-            i = 2
-            for indicator in indicators:
-                res[indicator] = row[i]
-                i = i+1
-            res['latitude'] = row[0]
-            res['longitude'] = row[1]
-            i = 2
+            # res = {}
+            # i = 2
+            # for indicator in indicators:
+            #     res[indicator] = row[i]
+            #     i = i+1
+            # res['latitude'] = row[0]
+            # res['longitude'] = row[1]
+            # i = 2
 
-            yield res
+            yield row
 
 def select_random(data, n=3): ## reservoir sampling
     result = [0] * n
@@ -120,7 +122,7 @@ def select_random(data, n=3): ## reservoir sampling
     return result
 
 
-def kmeans(rows, day, k=20):
+def kmeans(k, indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour):
     n_conv = 20
     epsilon = 0.01
 
@@ -135,9 +137,16 @@ def kmeans(rows, day, k=20):
         temp2 = [x**2 for x in temp2]
         return sqrt(sum(temp2))
 
+    def dist_c(c1, c2):
+        temp = []
+        for i in range(len(c1)):
+            temp.append(c1[i] - c2[i])
+        temp = [x**2 for x in temp]
+        return sqrt(sum(temp))
+
     def get_values(r):
         c = []
-        for i in range(2,n):
+        for i in range(2,len(r)):
             c.append(r[i])
         return tuple(c)
 
@@ -146,18 +155,18 @@ def kmeans(rows, day, k=20):
     def mul_v(s,v):
         return tuple([ s*v_i for v_i in v])
 
-    centroids = [get_values(r) for r in select_random(res, n=k)]
+    centroids = [get_values(r) for r in select_random(getIndicatorCluster(indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour), n=k)]
     centroids_count = None
     for i in range(n_conv):
-        accu_centroids = [(0,) * (len(r)-2)] * k
+        accu_centroids = [(0,) * 2] * k
         accu_count = [0] * k
-        for r in res:
+        for r in getIndicatorCluster(indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour):
             dist_centroids = [dist(r, c) for c in centroids]
             centroid_id = dist_centroids.index(min(dist_centroids))
             accu_centroids[centroid_id] = sum_v(accu_centroids[centroid_id], get_values(r))
             accu_count[centroid_id] += 1
         new_centroids = [mul_v(1/n, c) for c, n in zip(accu_centroids, accu_count)]
-        diff_centroids = [dist(old, new) for old, new in zip(centroids, new_centroids)]
+        diff_centroids = [dist_c(old, new) for old, new in zip(centroids, new_centroids)]
         centroids = new_centroids
         centroids_count = accu_count
         if max(diff_centroids) < epsilon:
