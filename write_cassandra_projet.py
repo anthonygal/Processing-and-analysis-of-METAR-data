@@ -28,9 +28,7 @@ create_query_1 = '''CREATE TABLE agaltier_zkang_metar_France_1(
                 relh float,
                 drct float,
                 sknt float,
-                p01i float,
                 alti float,
-                mslp float,
                 vsby float,
                 gust float,
 
@@ -46,20 +44,12 @@ create_query_1 = '''CREATE TABLE agaltier_zkang_metar_France_1(
 
                 wxcodes text,
 
-                ice_accretion_1hr float,
-                ice_accretion_3hr float,
-                ice_accretion_6hr float,
-
-                peak_wind_gust float,
-                peak_wind_drct float,
-                peak_wind_time text,
-
                 feel float,
 
                 metar text,
 
 
-                PRIMARY KEY ((latitude, longitude), year, month, hour, minute)
+                PRIMARY KEY ((station_id), year, month, hour, minute)
                 );'''
 
 create_query_2 = '''CREATE TABLE agaltier_zkang_metar_France_2(
@@ -79,9 +69,7 @@ create_query_2 = '''CREATE TABLE agaltier_zkang_metar_France_2(
                 relh float,
                 drct float,
                 sknt float,
-                p01i float,
                 alti float,
-                mslp float,
                 vsby float,
                 gust float,
 
@@ -97,26 +85,20 @@ create_query_2 = '''CREATE TABLE agaltier_zkang_metar_France_2(
 
                 wxcodes text,
 
-                ice_accretion_1hr float,
-                ice_accretion_3hr float,
-                ice_accretion_6hr float,
-
-                peak_wind_gust float,
-                peak_wind_drct float,
-                peak_wind_time text,
-
                 feel float,
 
                 metar text,
 
 
-                PRIMARY KEY ((year, month, hour, minute), latitude, longitude)
+                PRIMARY KEY ((station_id), latitude, longitude)
                 );'''
 
 def writecassandra_1(csvfilename, session):
     data = limit_gen(loadata(csvfilename),  1000)
     # data = loadata(csvfilename)
+    i = 0
     for r in data:
+    
         t = (
                     r["station"],
                     r['lat'],
@@ -133,9 +115,7 @@ def writecassandra_1(csvfilename, session):
                     r["relh"],
                     r["drct"],
                     r["sknt"],
-                    r["p01i"],
                     r["alti"],
-                    r["mslp"],
                     r["vsby"],
                     r["gust"],
 
@@ -150,14 +130,6 @@ def writecassandra_1(csvfilename, session):
                     r["skyl4"],
 
                     r["wxcodes"],
-
-                    r["ice_accretion_1hr"],
-                    r["ice_accretion_3hr"],
-                    r["ice_accretion_6hr"],
-
-                    r["peak_wind_gust"],
-                    r["peak_wind_drct"],
-                    r["peak_wind_time"],
 
                     r["feel"],
 
@@ -182,9 +154,7 @@ def writecassandra_1(csvfilename, session):
             relh,
             drct,
             sknt,
-            p01i,
             alti,
-            mslp,
             vsby,
             gust,
 
@@ -200,20 +170,12 @@ def writecassandra_1(csvfilename, session):
 
             wxcodes,
 
-            ice_accretion_1hr,
-            ice_accretion_3hr,
-            ice_accretion_6hr,
-
-            peak_wind_gust,
-            peak_wind_drct,
-            peak_wind_time,
-
             feel,
 
             metar
 
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         session.execute(query, t)
 
@@ -322,10 +284,10 @@ def writecassandra_2(csvfilename, session):
         session.execute(query, t)
 
 
-session.execute('DROP TABLE agaltier_zkang_metar_France_1')
+session.execute('DROP TABLE IF EXISTS agaltier_zkang_metar_France_1')
 session.execute(create_query_1)
 writecassandra_1(csvfilename, session)
 
-session.execute('DROP TABLE agaltier_zkang_metar_France_2')
+session.execute('DROP TABLE IF EXISTS agaltier_zkang_metar_France_2')
 session.execute(create_query_2)
 writecassandra_2(csvfilename, session)
