@@ -8,19 +8,9 @@ from math import sqrt
 
 import random
 
-from pykrige.ok import OrdinaryKriging
-from pykrige.kriging_tools import write_asc_grid
-import pykrige.kriging_tools as kt
-import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
-from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import Path, PathPatch
 
 
 
-# rows = session.execute('SELECT * FROM agaltier_zkang_metar_France_2 LIMIT 10 ;')
-# for row in rows:
-#     print(row)
 
 def getIndicatorCluster(indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour):
     cluster = Cluster(['localhost'])
@@ -39,75 +29,65 @@ def getIndicatorCluster(indicators, start_year, start_month, start_day, start_ho
                 FROM agaltier_zkang_metar_France_2
                 WHERE year >= """ + str(start_year) + """
                 AND year <= """ + str(end_year) + """
-                LIMIT 40
                 ALLOW FILTERING;
                 """
-    elif (start_month != end_month):
+    else :
         query = """
                 SELECT latitude, longitude""" + inds + """
                 FROM agaltier_zkang_metar_France_2
                 WHERE year = """ + str(start_year) + """
-                AND month >= """ + str(start_month) + """
-                AND month <= """ + str(end_month) + """
-                LIMIT 10000
                 ALLOW FILTERING;
                 """
-    elif(start_day != end_day):
-        query = """
-                SELECT latitude, longitude""" + inds + """
-                FROM agaltier_zkang_metar_France_2
-                WHERE year = """ + str(start_year) + """
-                AND month = """ + str(start_month) + """
-                AND day >= """ + str(start_day) + """
-                AND day <= """ + str(end_day) + """
-                LIMIT 100
-                ALLOW FILTERING;
-                """
-    elif (start_hour != end_hour):
-        query = """
-                SELECT latitude, longitude""" + inds + """
-                FROM agaltier_zkang_metar_France_2
-                WHERE year = """ + str(start_year) + """
-                AND month = """ + str(start_month) + """
-                AND day = """ + str(start_day) + """
-                AND hour >= """ + str(start_hour) + """
-                AND hour <= """ + str(end_hour) + """
-                LIMIT 10000
-                ALLOW FILTERING;
-                """
-    else:
-        query = """
-                SELECT latitude, longitude""" + inds + """
-                FROM agaltier_zkang_metar_France_2
-                WHERE year = """ + str(start_year) + """
-                AND month = """ + str(start_month) + """
-                AND day = """ + str(start_day) + """
-                AND hour = """ + str(start_hour) + """
-                LIMIT 10000
-                ALLOW FILTERING;
-                """
+    # elif (start_month != end_month):
+    #     query = """
+    #             SELECT latitude, longitude""" + inds + """
+    #             FROM agaltier_zkang_metar_France_2
+    #             WHERE year = """ + str(start_year) + """
+    #             AND month >= """ + str(start_month) + """
+    #             AND month <= """ + str(end_month) + """
+    #             ALLOW FILTERING;
+    #             """
+    # elif(start_day != end_day):
+    #     query = """
+    #             SELECT latitude, longitude""" + inds + """
+    #             FROM agaltier_zkang_metar_France_2
+    #             WHERE year = """ + str(start_year) + """
+    #             AND month = """ + str(start_month) + """
+    #             AND day >= """ + str(start_day) + """
+    #             AND day <= """ + str(end_day) + """
+    #                             ALLOW FILTERING;
+    #             """
+    # elif (start_hour != end_hour):
+    #     query = """
+    #             SELECT latitude, longitude""" + inds + """
+    #             FROM agaltier_zkang_metar_France_2
+    #             WHERE year = """ + str(start_year) + """
+    #             AND month = """ + str(start_month) + """
+    #             AND day = """ + str(start_day) + """
+    #             AND hour >= """ + str(start_hour) + """
+    #             AND hour <= """ + str(end_hour) + """
+    #                             ALLOW FILTERING;
+    #             """
+    # else:
+    #     query = """
+    #             SELECT latitude, longitude""" + inds + """
+    #             FROM agaltier_zkang_metar_France_2
+    #             WHERE year = """ + str(start_year) + """
+    #             AND month = """ + str(start_month) + """
+    #             AND day = """ + str(start_day) + """
+    #             AND hour = """ + str(start_hour) + """
+    #                             ALLOW FILTERING;
+    #             """
 
     print(query)
     rows = session.execute(query)
 
-    lats = []
-    lons= []
-    values = []
 
     for row in rows:
         flag = True
         for x in row:
             if (x == None): flag = False
         if (flag & (row[0]>=40) & (row[0]<=50) & (row[1]!=None) & (row[1]>=-5) & (row[1]<=7.5)):
-            # res = {}
-            # i = 2
-            # for indicator in indicators:
-            #     res[indicator] = row[i]
-            #     i = i+1
-            # res['latitude'] = row[0]
-            # res['longitude'] = row[1]
-            # i = 2
-
             yield row
 
 def select_random(data, n=3): ## reservoir sampling
@@ -158,20 +138,33 @@ def kmeans(k, indicators, start_year, start_month, start_day, start_hour, end_ye
     centroids = [get_values(r) for r in select_random(getIndicatorCluster(indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour), n=k)]
     centroids_count = None
     for i in range(n_conv):
-        accu_centroids = [(0,) * 2] * k
+        accu_centroids = [(0,) * len(indicators)] * k
         accu_count = [0] * k
         for r in getIndicatorCluster(indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour):
             dist_centroids = [dist(r, c) for c in centroids]
             centroid_id = dist_centroids.index(min(dist_centroids))
             accu_centroids[centroid_id] = sum_v(accu_centroids[centroid_id], get_values(r))
             accu_count[centroid_id] += 1
+
         new_centroids = [mul_v(1/n, c) for c, n in zip(accu_centroids, accu_count)]
         diff_centroids = [dist_c(old, new) for old, new in zip(centroids, new_centroids)]
         centroids = new_centroids
         centroids_count = accu_count
         if max(diff_centroids) < epsilon:
             break
-    return (centroids, centroids_count)
+
+    res = {}
+    res['centers'] = []
+    res['count'] = centroids_count
+    for centroid in centroids:
+        c = {}
+        for index, indicator in enumerate(indicators):
+            c[indicator]=centroid[index]
+        res['centers'].append(c)
+    return res
+
+# def plot_kmeans_map(km,  indicators, start_year, start_month, start_day, start_hour, end_year, end_month, end_day, end_hour):
+
 
 
 
