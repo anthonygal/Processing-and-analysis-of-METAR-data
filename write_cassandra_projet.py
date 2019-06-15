@@ -53,44 +53,42 @@ create_query_1 = '''CREATE TABLE agaltier_zkang_metar_France_1(
                 );'''
 
 create_query_2 = '''CREATE TABLE agaltier_zkang_metar_France_2(
-
                 station_id text,
                 latitude float,
                 longitude float,
-
                 year varint,
                 month varint,
                 day varint,
                 hour varint,
                 minute varint,
-
                 tmpf float,
                 dwpf float,
                 relh float,
                 drct float,
                 sknt float,
+                p01i float,
                 alti float,
+                mslp float,
                 vsby float,
                 gust float,
-
                 skyc1 text,
                 skyc2 text,
                 skyc3 text,
                 skyc4 text,
-
                 skyl1 float,
                 skyl2 float,
                 skyl3 float,
                 skyl4 float,
-
                 wxcodes text,
-
+                ice_accretion_1hr float,
+                ice_accretion_3hr float,
+                ice_accretion_6hr float,
+                peak_wind_gust float,
+                peak_wind_drct float,
+                peak_wind_time text,
                 feel float,
-
                 metar text,
-
-
-                PRIMARY KEY ((station_id), latitude, longitude)
+                PRIMARY KEY ((year, month, hour, minute), latitude, longitude)
                 );'''
 
 def writecassandra_1(csvfilename, session):
