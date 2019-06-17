@@ -45,17 +45,9 @@ res_redu = res_map.reduceByKey(lambda a, b: (a[0]+b[0], a[1]+b[1], min(a[2], b[2
 res = res_redu.map(lambda a: ((a[0][0], a[0][1]), a[1][1]/a[1][0], a[1][2], a[1][3],
                                np.sqrt(-(a[1][1]/a[1][0])**2+a[1][4]/a[1][0])))
 
-data = []
+data_month = np.zeros((9, 12))
 for row in res.collect():
-	data.append([(row[0][0], row[0][1]), row[1], row[2], row[3], row[4]])
-
-# trier car l'ordre est casse a cause de parallelization
-data = sorted(data, key = lambda a: a[0])
-data = np.array(data)
-
-# transformer la clef en "aaaa-mm"
-x = data[:, 0]
-x = [str(a[0])+"-"+str(a[1]) for a in x]
+	data_month[row[0][0]-2001, row[0][1]-1] = row[1]
 
 # Saison:
 data_saison = []
@@ -73,23 +65,19 @@ data_saison = np.array(data_saison)
 
 # transformer (0, 1, 2, 3) en (1, 2, 3, 4)
 data_saison[:, 0] += 1
-"""
-data_saison[:, 0] = range(0, 4)
-for data_month in data:
-    #print(data_month)
-    data_saison[int(data_month[0][1])//3, 1:] += data_month[1:]
-"""
+
 fig = plt.figure()
 gridspec.GridSpec(4,3)
 fig.set_size_inches(18.5, 10.5)
 fig.suptitle("Variantion des stats d'indicateur {} de station {} ".format(opt.indicateur, opt.station_id), fontsize=22)
 
 plt.subplot2grid((4,3), (0,0), colspan=2, rowspan=4)
-plt.title("Variation par rapport au mois")
-plt.gca().xaxis.set_major_locator(MaxNLocator(prune='lower'))
-plt.plot(x, data[:, 1])
-plt.legend(['Moyen', 'Min', 'Max'], loc='upper left')
-fig.autofmt_xdate()
+plt.title("Variation de moyen par rapport au mois")
+palette = plt.get_cmap('Set1')
+for i in range(9):
+	plt.plot(range(1, 13), data_month[i, :], color=palette(i+1), label = "200"+str(i+1) )
+plt.legend(loc=2, ncol=2)
+plt.xticks(np.arange(1, 13))
 
 
 plt.subplot2grid((4,3), (0,2))
