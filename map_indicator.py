@@ -12,9 +12,6 @@ from matplotlib.patches import Path, PathPatch
 
 
 
-# rows = session.execute('SELECT * FROM agaltier_zkang_metar_France_2 LIMIT 10 ;')
-# for row in rows:
-#     print(row)
 
 def getIndicatorMap(year, month, day, hour, indicator):
     cluster = Cluster(['localhost'])
@@ -29,10 +26,6 @@ def getIndicatorMap(year, month, day, hour, indicator):
             AND month = """ + str(month) + """
             AND day = """ + str(day) + """
             AND hour = """ + str(hour) + """
-
-
-            LIMIT 10000
-            ALLOW FILTERING ;
             """
 
     rows = session.execute(query)
@@ -52,9 +45,6 @@ def getIndicatorMap(year, month, day, hour, indicator):
     res['longitudes'] = lons
     res['values'] = values
 
-#     return res
-#
-# res = get_data_by_time(2008,9,11,4, 'tmpf')
 
     lats = np.array(res['latitudes'])
     lons = np.array(res['longitudes'])
