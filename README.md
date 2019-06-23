@@ -45,11 +45,11 @@ Using iPython:
 >> from cluster_indicators import kmeans
 >> from cluster_indicators import plot_kmeans_map
 
->> kmeans(7, ['tmpf', 'alti', 'feel'], 2003, 8, 3, 17, 2003, 11, 28, 17) 
+>> kmeans(7, ['tmpf', 'alti', 'feel'], 2009, 3, 3, 17, 2009, 5, 28, 17)
 # returns the clusters central values and count
 # warning: start year must be the same as end year for now
 
->> plot_kmeans_map(7, ['tmpf', 'alti', 'feel'], 2001, 2, 3, 17, 2001, 3, 28, 17)
+>> plot_kmeans_map(7, ['tmpf', 'alti', 'feel'], 2009, 3, 3, 17, 2009, 5, 28, 17)
 # the resulting PNG figure will be saved to the current working directory
 # warning: start year must be the same as end year for now
 
