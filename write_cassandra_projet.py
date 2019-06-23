@@ -403,10 +403,10 @@ def writecassandra_3(csvfilename, session):
 # session.execute(create_query_1)
 # writecassandra_1(csvfilename, session)
 
-session.execute('DROP TABLE IF EXISTS agaltier_zkang_metar_France_2')
-session.execute(create_query_2)
-writecassandra_2(csvfilename, session)
-#
+# session.execute('DROP TABLE IF EXISTS agaltier_zkang_metar_France_2')
+# session.execute(create_query_2)
+# writecassandra_2(csvfilename, session)
+
 # session.execute('DROP TABLE IF EXISTS agaltier_zkang_metar_France_3')
 # session.execute(create_query_3)
 # writecassandra_3(csvfilename, session)
