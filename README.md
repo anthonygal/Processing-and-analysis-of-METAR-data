@@ -33,7 +33,7 @@ Question2: Plot indicators of a specific time in a map <br/>
 Using iPython:
 ```
 >> from map_indicator import getIndicatorMap
->> getIndicatorMap(2002, 7, 23, 16, 'tmpf')
+>> getIndicatorMap(2001, 7, 23, 16, 'tmpf')
 # The resulting PNG figure will be saved to the current working directory.
 ```
 
@@ -43,13 +43,13 @@ Question3: Plot clustering <br/>
 Using iPython:
 ```
 >> from cluster_indicators import kmeans
->> from cluster_indicators import plot_kmeans
+>> from cluster_indicators import plot_kmeans_map
 
 >> kmeans(7, ['tmpf', 'alti', 'feel'], 2003, 8, 3, 17, 2003, 11, 28, 17) 
 # returns the clusters central values and count
 # warning: start year must be the same as end year for now
 
->> plot_kmeans(7, ['tmpf', 'alti', 'feel'], 2003, 8, 3, 17, 2003, 11, 28, 17) #warning: start year must be the same as end year for now
+>> plot_kmeans_map(7, ['tmpf', 'alti', 'feel'], 2003, 8, 3, 17, 2003, 11, 28, 17) #warning: start year must be the same as end year for now
 # the resulting PNG figure will be saved to the current working directory
 # warning: start year must be the same as end year for now
 
