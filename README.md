@@ -19,7 +19,7 @@ Files to be executed: <br/>
 
 Cassandra, PySpark, matplotlib, numpy...
 
-ASOS.txt data file downloaded from: https://mesonet.agron.iastate.edu/request/download.phtml, where missing values are recorded as 'M'.
+asos.txt data file downloaded from: https://mesonet.agron.iastate.edu/request/download.phtml, where missing values are recorded as 'M'.
 
 
 ## Instructions for running the files.
