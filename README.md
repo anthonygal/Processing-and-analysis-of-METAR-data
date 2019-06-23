@@ -29,7 +29,7 @@ Question1: Plot indicators over time
 Python plot_indicator_over_time.py --station_id='LFST' --indicateur='tmpf'
 ```
 
-Question2: Plot indicators of a specific time in a map
+Question2: Plot indicators of a specific time in a map <br/>
 Using iPython:
 ```
 >> from map_indicator import getIndicatorMap
@@ -39,7 +39,7 @@ Using iPython:
 
 
 
-Question3: Plot clustering
+Question3: Plot clustering <br/>
 Using iPython:
 ```
 >> from cluster_indicators import kmeans
