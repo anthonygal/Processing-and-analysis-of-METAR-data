@@ -49,7 +49,7 @@ Using iPython:
 # returns the clusters central values and count
 # warning: start year must be the same as end year for now
 
->> plot_kmeans_map(7, ['tmpf', 'alti', 'feel'], 2003, 8, 3, 17, 2003, 11, 28, 17) #warning: start year must be the same as end year for now
+>> plot_kmeans_map(7, ['tmpf', 'alti', 'feel'], 2001, 2, 3, 17, 2001, 3, 28, 17)
 # the resulting PNG figure will be saved to the current working directory
 # warning: start year must be the same as end year for now
 
